@@ -44,7 +44,7 @@
 {%- for n in journalnode_hosts %}
 {%- do connection_string_list.append( n + ':' + ha_journal_port | string() ) %}
 {%- endfor %}
-{%- set quorum_connection_string = connection_string_list | join(",")%}
+{%- set quorum_connection_string = connection_string_list | join(';')%}
 {%- else %}
 {%- set quorum_connection_string = "" %}
 {%- endif %}

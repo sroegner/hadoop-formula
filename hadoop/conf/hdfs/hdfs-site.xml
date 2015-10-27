@@ -2,13 +2,13 @@
 {%- from 'hadoop/hdfs/settings.sls' import hdfs with context %}
 {%- set dyn_cfg = hdfs.get('config_hdfs_site', {}) %}
 {%- set major = hadoop.major_version|string() -%}
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 {%- if hdfs.namenode_count == 2 %}
 {%- from 'zookeeper/settings.sls' import zk with context %}
 {%- else %}
 {%- set zk = {} %}
 {%- endif %}
-<?xml version="1.0" encoding="UTF-8"?>
-<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
 
 <configuration>
     <property>
