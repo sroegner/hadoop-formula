@@ -3,7 +3,6 @@
 {%- set g  = salt['grains.get']('hdfs', {}) %}
 {%- set gc = g.get('config', {}) %}
 
-# TODO: https://github.com/accumulo/hadoop-formula/issues/1 'Replace direct mine.get calls'
 {%- set namenode_target     = g.get('namenode_target', p.get('namenode_target', 'roles:hadoop_master')) %}
 {%- set datanode_target     = g.get('datanode_target', p.get('datanode_target', 'roles:hadoop_slave')) %}
 {%- set journalnode_target  = g.get('journalnode_target', p.get('journalnode_target', 'roles:hdfs_journalnode')) %}
@@ -33,7 +32,7 @@
 {%- set local_disks           = salt['grains.get']('hdfs_data_disks', ['/data']) %}
 {%- set hdfs_repl_override    = gc.get('replication', pc.get('replication', 'x')) %}
 {%- set load                  = salt['grains.get']('hdfs_load', salt['pillar.get']('hdfs_load', {})) %}
-{%- set ha_cluster_id         = salt['grains.get']('ha_cluster_id', salt['pillar.get']('ha_cluster_id', 'hdfs_ha_cluster')) %}
+{%- set ha_cluster_id         = salt['grains.get']('ha_cluster_id', salt['pillar.get']('ha_cluster_id', 'hdfscluster')) %}
 {%- set ha_namenode_port      = gc.get('ha_namenode_port', pc.get('ha_namenode_port', namenode_port)) %}
 {%- set ha_journal_port       = gc.get('ha_journal_port', pc.get('ha_journal_port', '8485')) %}
 {%- set ha_namenode_http_port = gc.get('ha_namenode_http_port', pc.get('ha_namenode_http_port', namenode_http_port)) %}
