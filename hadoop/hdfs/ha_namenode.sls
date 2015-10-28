@@ -6,9 +6,7 @@
 {%- set hdfs_disks = hdfs.local_disks %}
 {%- set test_folder = hdfs_disks|first() + '/hdfs/nn/current' %}
 
-{% if hdfs.is_namenode %}
-{% if hdfs.namenode_count == 2 %}
-
+{% if hdfs.is_primary_namenode %}
 nc:
   pkg.installed
 
@@ -31,5 +29,4 @@ hdfs-services:
       - hadoop-zkfc
 
 # hdfs namenode –bootstrapStandby
-{% endif %}
 {% endif %}

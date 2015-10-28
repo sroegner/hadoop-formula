@@ -4,22 +4,36 @@
 {%- set gc = g.get('config', {}) %}
 
 {%- set namenode_target     = g.get('namenode_target', p.get('namenode_target', 'roles:hadoop_master')) %}
+{%- set primary_namenode_target   = g.get('primary_namenode_target', p.get('primary_namenode_target', 'roles:hdfs_namenode1')) %}
+{%- set secondary_namenode_target = g.get('secondary_namenode_target', p.get('secondary_namenode_target', 'roles:hdfs_namenode2')) %}
 {%- set datanode_target     = g.get('datanode_target', p.get('datanode_target', 'roles:hadoop_slave')) %}
 {%- set journalnode_target  = g.get('journalnode_target', p.get('journalnode_target', 'roles:hdfs_journalnode')) %}
 # this is a deliberate duplication as to not re-import hadoop/settings multiple times
 {%- set targeting_method    = salt['grains.get']('hadoop:targeting_method', salt['pillar.get']('hadoop:targeting_method', 'grain')) %}
 
 # HA requires that you have exactly two NNs
-{%- set namenode_host       = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method)|first %}
-{%- set namenode_hosts      = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set namenode_host       = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set primary_namenode_host = salt['mine.get'](primary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set secondary_namenode_host = salt['mine.get'](secondary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+
+# sanitize ha targets - there can always be more than one, so we pick the first
+{%- if primary_namenode_host|count() > 0 %}
+{%- set primary_namenode_host = primary_namenode_host|first() %}
+{%- endif %}
+{%- if secondary_namenode_host|count() > 0 %}
+{%- set secondary_namenode_host = secondary_namenode_host|first() %}
+{%- endif %}
+
+# {%- set primary_namenode_host   = primary_namenode_host|string %}
+# {%- set secondary_namenode_host = secondary_namenode_host|string %}
+{%- set namenode_hosts      = [primary_namenode_host,secondary_namenode_host] %}
 {%- set namenode_count      = namenode_hosts|count() %}
 
-# fix the case where someone targets 2+ nodes to be namenodes
-{%- if namenode_count > 2 %}
-{%- set namenode_hosts = [namenode_hosts|first, namenode_hosts|last]%}
-{%- set namenode_count = namenode_hosts|count() %}
-{%- elif namenode_count == 1 %}
-{%- set namenode_hosts = {} %}
+# provide a single namenode host when only ha targets are there
+{%- if namenode_count > 0 %}
+{%- if namenode_host == [] %}
+{%- set namenode_host = primary_namenode_host %}
+{%- endif %}
 {%- endif %}
 
 {%- set datanode_hosts        = salt['mine.get'](datanode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
@@ -68,6 +82,8 @@
 {%- set config_hdfs_site = gc.get('hdfs-site', pc.get('hdfs-site', {})) %}
 
 {%- set is_namenode    = salt['match.' ~ targeting_method](namenode_target) %}
+{%- set is_primary_namenode   = salt['match.' ~ targeting_method](primary_namenode_target) %}
+{%- set is_secondary_namenode = salt['match.' ~ targeting_method](secondary_namenode_target) %}
 {%- set is_journalnode = salt['match.' ~ targeting_method](journalnode_target) %}
 {%- set is_datanode    = salt['match.' ~ targeting_method](datanode_target) %}
 {%- set hdfs = {} %}
@@ -82,6 +98,8 @@
                      'namenode_http_port'          : namenode_http_port,
                      'ha_namenode_http_port'       : ha_namenode_http_port,
                      'is_namenode'                 : is_namenode,
+                     'is_primary_namenode'         : is_primary_namenode,
+                     'is_secondary_namenode'       : is_secondary_namenode,
                      'is_journalnode'              : is_journalnode,
                      'is_datanode'                 : is_datanode,
                      'secondarynamenode_http_port' : secondarynamenode_http_port,
