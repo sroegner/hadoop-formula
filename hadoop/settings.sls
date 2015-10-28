@@ -37,8 +37,8 @@
                                         'source_url'    : g.get('source_url', p.get('source_url', 'http://archive.apache.org/dist/hadoop/core/hadoop-2.6.0/hadoop-2.6.0.tar.gz')),
                                         'major_version' : '2',
                                       },
-                     'hdp-2.7.1'    : { 'version'       : '2.3.2.0-2950',
-                                        'version_name'  : 'hadoop-2.3.2.0-2950',
+                     'hdp-2.7.1'    : { 'version'       : '2.7.1.2.3.2.0-2950',
+                                        'version_name'  : 'hadoop-2.7.1.2.3.2.0-2950',
                                         'source_url'    : g.get('source_url', p.get('source_url', 'http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.3.2.0/tars/hadoop-2.7.1.2.3.2.0-2950.tar.gz')),
                                         'major_version' : '2'
                                       },

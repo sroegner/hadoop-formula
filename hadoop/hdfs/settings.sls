@@ -12,28 +12,26 @@
 {%- set targeting_method    = salt['grains.get']('hadoop:targeting_method', salt['pillar.get']('hadoop:targeting_method', 'grain')) %}
 
 # HA requires that you have exactly two NNs
-{%- set namenode_host       = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
-{%- set primary_namenode_host = salt['mine.get'](primary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set namenode_host           = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set primary_namenode_host   = salt['mine.get'](primary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
 {%- set secondary_namenode_host = salt['mine.get'](secondary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
+{%- set namenode_hosts          = [] %}
 
-# sanitize ha targets - there can always be more than one, so we pick the first
+# it is required to specify the namenode target and one of primary and secondary for each namenode
+{%- set namenode_count = namenode_host|count() %}
+
+# sanitize targeting results - these come as arrays, so we always pick the first
+{%- if namenode_host|count() > 0 %}
+{%- set namenode_host = namenode_host|first()|join() %}
+{%- endif %}
+
 {%- if primary_namenode_host|count() > 0 %}
-{%- set primary_namenode_host = primary_namenode_host|first() %}
-{%- endif %}
-{%- if secondary_namenode_host|count() > 0 %}
-{%- set secondary_namenode_host = secondary_namenode_host|first() %}
-{%- endif %}
-
-# {%- set primary_namenode_host   = primary_namenode_host|string %}
-# {%- set secondary_namenode_host = secondary_namenode_host|string %}
-{%- set namenode_hosts      = [primary_namenode_host,secondary_namenode_host] %}
-{%- set namenode_count      = namenode_hosts|count() %}
-
-# provide a single namenode host when only ha targets are there
-{%- if namenode_count > 0 %}
-{%- if namenode_host == [] %}
-{%- set namenode_host = primary_namenode_host %}
-{%- endif %}
+  {%- set primary_namenode_host = primary_namenode_host|first() %}
+  {%- set namenode_hosts = [primary_namenode_host] %}
+  {%- if secondary_namenode_host|count() > 0 %}
+    {%- set secondary_namenode_host = secondary_namenode_host|first() %}
+    {%- set namenode_hosts      = [primary_namenode_host,secondary_namenode_host] %}
+  {%- endif %}
 {%- endif %}
 
 {%- set datanode_hosts        = salt['mine.get'](datanode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
@@ -80,7 +78,6 @@
 {%- endif %}
 
 {%- set config_hdfs_site = gc.get('hdfs-site', pc.get('hdfs-site', {})) %}
-
 {%- set is_namenode    = salt['match.' ~ targeting_method](namenode_target) %}
 {%- set is_primary_namenode   = salt['match.' ~ targeting_method](primary_namenode_target) %}
 {%- set is_secondary_namenode = salt['match.' ~ targeting_method](secondary_namenode_target) %}
