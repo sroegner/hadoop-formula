@@ -1,5 +1,5 @@
 ========================
-hadoop high availability
+Hadoop High Availability
 ========================
 
 Description of additional steps for provisioning highly available services.
@@ -11,7 +11,7 @@ Please consider this feature experimental, in particular do not attempt to use i
 environment. Also note that at this point there is no (and probably never will be) support for migration
 from singlenode into HA mode.
 
-This extension can be mainly be useful in quickly setting up a functioning Hadoop HA environment for testing purposes.
+This extension can mainly be useful in quickly setting up a functioning Hadoop HA environment for testing purposes.
 
 New states:
 ===========
@@ -19,18 +19,13 @@ New states:
 .. contents::
     :local:
 
-``hadoop``
-----------
-
-Downloads the hadoop tarball from the hadoop:source_url, installs the package, creates the hadoop group for all other components to share.
-
 ``hadoop.hdfs.ha_namenode``
 ---------------
 
-::
-
-    roles:
-      - hadoop_slave
+Will only have effect on nodes targetted as `primary_namenode_target` and `secondary_namenode_target`.
+As there is only this one state (having different effects on the two types) your orchestration will have to take
+care of this happening in the correct order (primary first, then secondary). There is also a substantual number
+of additional prerequisites prior to Namenode initialization, described below.
 
 Additional Formula Dependencies:
 ================================
@@ -86,21 +81,21 @@ Orchestration Example:
 
 Since this feature is more complex than the already distributed Hadoop architecture normally is, here is a short listing of service components and their place in the order of setup - as should be mandated by a salt orchestration script.
 
-# Prerequisites as usual (name resolution, NTP, JDK installation)
-# Install Hadoop binaries and configuration on all targeted Hadoop cluster members
-# Install Zookeeper binaries and configuration on all targeted Zookeeper cluster members
-# Start all service members of the Zookeeper cluster
-# Start all HDFS datanodes
-# Start all HDFS journalnodes
-# On the designated "first" namenode (to become the active member):
-  # Initialize HDFS namenode metadata as usual (hdfs namenode -format)
-  # Initialize Zookeeper for namenode HA (hdfs zkfc -formatZK)
-  # Start namenode service as usual (service hadoop-namenode start)
-  # Start the zookeeper fencing service (service hadoop-zkfc start)
-# On the designated "second" namenode (to become the standby member):
-  # Prepare HDFS namenode metadata (hdfs namenode -prepareStandby)
-  # Start namenode service as usual (service hadoop-namenode start)
-  # Start the zookeeper fencing service (service hadoop-zkfc start)
+1. Prerequisites as usual (name resolution, NTP, JDK installation)
+2. Install Hadoop binaries and configuration on all targeted Hadoop cluster members
+3. Install Zookeeper binaries and configuration on all targeted Zookeeper cluster members
+4. Start all service members of the Zookeeper cluster
+5. Start all HDFS datanodes
+6 Start all HDFS journalnodes
+7. On the designated "first" namenode (to become the active member):
+  a) Initialize HDFS namenode metadata as usual (hdfs namenode -format)
+  b) Initialize Zookeeper for namenode HA (hdfs zkfc -formatZK)
+  c) Start namenode service as usual (service hadoop-namenode start)
+  d) Start the zookeeper fencing service (service hadoop-zkfc start)
+8. On the designated "second" namenode (to become the standby member):
+  a) Prepare HDFS namenode metadata (hdfs namenode -prepareStandby)
+  b) Start namenode service as usual (service hadoop-namenode start)
+  c) Start the zookeeper fencing service (service hadoop-zkfc start)
 
 Below is an example orchestration script to illustrate what the listed actions might look like in Salt
 
