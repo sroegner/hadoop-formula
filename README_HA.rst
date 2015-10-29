@@ -86,8 +86,8 @@ Since this feature is more complex than the already distributed Hadoop architect
 3. Install Zookeeper binaries and configuration on all targeted Zookeeper cluster members
 4. Start all service members of the Zookeeper cluster
 5. Start all HDFS datanodes
-6 Start all HDFS journalnodes
-7. On the designated "first" namenode (to become the active member):
+6. Start all HDFS journalnodes
+7. On the designated "first" namenode (to become the active member)
   a) Initialize HDFS namenode metadata as usual (hdfs namenode -format)
   b) Initialize Zookeeper for namenode HA (hdfs zkfc -formatZK)
   c) Start namenode service as usual (service hadoop-namenode start)
