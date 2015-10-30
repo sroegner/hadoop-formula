@@ -17,11 +17,12 @@ format-namenode:
     - user: hdfs
     - unless: test -d {{ test_folder }}
 
-# TODO: add a zookeeper state check
 format-zookeeper:
   cmd.run:
     - name: {{ hadoop.alt_home }}/bin/hdfs zkfc -formatZK
     - user: hdfs
+    - unless: service status hadoop-zkfc
+    - onlyif: echo 'ls /hadoop-ha' | {{zk.alt_home}}/bin/zkCli.sh 2>&1 | grep 'Node does not exist'
 
 {%- elif hdfs.is_secondary_namenode %}
   # orchestration has to ensure that this part runs after the primary has successfully finished
