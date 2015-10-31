@@ -6,8 +6,10 @@
 {%- set hdfs_disks = hdfs.local_disks %}
 {%- set test_folder = hdfs_disks|first() + '/hdfs/nn/current' %}
 
-nc:
+{%- if hdfs.is_primary_namenode or hdfs.is_secondary_namenode %}
+{{ hdfs.netcat.pkg }}:
   pkg.installed
+{% endif %}
 
 {%- if hdfs.is_primary_namenode %}
 

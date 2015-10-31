@@ -83,6 +83,16 @@
 {%- set is_secondary_namenode = salt['match.' ~ targeting_method](secondary_namenode_target) %}
 {%- set is_journalnode = salt['match.' ~ targeting_method](journalnode_target) %}
 {%- set is_datanode    = salt['match.' ~ targeting_method](datanode_target) %}
+
+{%- set netcat = salt['grains.filter_by']({
+    'Redhat': {
+        'pkg': 'nc',
+    },
+    'Debian': {
+        'pkg': 'netcat-traditional',
+    },
+}) %}
+
 {%- set hdfs = {} %}
 {%- do hdfs.update({ 'local_disks'                 : local_disks,
                      'namenode_host'               : namenode_host,
@@ -108,4 +118,5 @@
                      'load'                        : load,
                      'ha_cluster_id'               : ha_cluster_id,
                      'quorum_connection_string'    : quorum_connection_string,
+                     'netcat'                      : netcat,
                    }) %}
