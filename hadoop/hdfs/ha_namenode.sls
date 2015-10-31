@@ -7,9 +7,14 @@
 {%- set test_folder = hdfs_disks|first() + '/hdfs/nn/current' %}
 
 {%- if hdfs.is_primary_namenode or hdfs.is_secondary_namenode %}
-{{ hdfs.netcat.pkg }}:
-  pkg.installed
-{% endif %}
+{%- if grains['os_family'] == 'RedHat' %}
+'nc':
+   pkg.installed
+{%- elif grains['os_family'] == 'Debian' %}
+'netcat-traditional':
+   pkg.installed
+{%- endif %}
+{%- endif %}
 
 {%- if hdfs.is_primary_namenode %}
 
