@@ -50,6 +50,7 @@ Example ``/etc/salt/grains`` for the "primary" namenode:
 
     roles:
       - hadoop_master
+      - yarn_master
       - hdfs_namenode1
 
 Example ``/etc/salt/grains`` for the "secondary" namenode:
