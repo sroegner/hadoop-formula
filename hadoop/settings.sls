@@ -149,6 +149,16 @@
 {%- set default_log_root = '/var/log/hadoop' %}
 {%- set log_root         = gc.get('log_root', pc.get('log_root', default_log_root)) %}
 {%- set initscript       = 'hadoop.init' %}
+{%- set ssh_key_type     = p.get('ssh_key_type', 'dsa') %}
+{%- set ssh_key_source   = p.get('ssh_key_source', 'files') %}
+{%- if ssh_key_source == 'pillar' %}
+{%- set ssh_private_key_path = 'hadoop.users.private_keys' %}
+{%- set ssh_public_key_path = 'hadoop.users.public_keys' %}
+{%- else %}
+{%- set ssh_private_key_path = 'salt://hadoop/files' %}
+{%- set ssh_public_key_path = 'salt://hadoop/files' %}
+{%- endif %}
+
 {%- set targeting_method = g.get('targeting_method', p.get('targeting_method', 'grain')) %}
 
 {%- if version_info['major_version'] == '1' %}
@@ -169,25 +179,28 @@
                 } %}
 
 {%- set hadoop = {} %}
-{%- do hadoop.update( {   'dist_id'          : dist_id,
-                          'cdhmr1'           : version_info.get('cdhmr1', False),
-                          'version'          : version_info['version'],
-                          'version_name'     : version_info['version_name'],
-                          'source_url'       : version_info['source_url'],
-                          'source_hash'      : version_info['source_hash'],
-                          'major_version'    : version_info['major_version']|string(),
-                          'alt_home'         : alt_home,
-                          'real_home'        : real_home,
-                          'alt_config'       : alt_config,
-                          'real_config'      : real_config,
-                          'real_config_dist' : real_config_dist,
-                          'initscript'       : initscript,
-                          'dfs_cmd'          : dfs_cmd,
-                          'dfsadmin_cmd'     : dfsadmin_cmd,
-                          'java_home'        : java_home,
-                          'log_root'         : log_root,
-                          'default_log_root' : default_log_root,
-                          'config_core_site' : config_core_site,
-                          'targeting_method' : targeting_method,
-                          'users'            : users,
+{%- do hadoop.update( {   'dist_id'              : dist_id,
+                          'cdhmr1'               : version_info.get('cdhmr1', False),
+                          'version'              : version_info['version'],
+                          'version_name'         : version_info['version_name'],
+                          'source_url'           : version_info['source_url'],
+                          'source_hash'          : version_info['source_hash'],
+                          'major_version'        : version_info['major_version']|string(),
+                          'alt_home'             : alt_home,
+                          'real_home'            : real_home,
+                          'alt_config'           : alt_config,
+                          'real_config'          : real_config,
+                          'real_config_dist'     : real_config_dist,
+                          'initscript'           : initscript,
+                          'dfs_cmd'              : dfs_cmd,
+                          'dfsadmin_cmd'         : dfsadmin_cmd,
+                          'java_home'            : java_home,
+                          'log_root'             : log_root,
+                          'default_log_root'     : default_log_root,
+                          'config_core_site'     : config_core_site,
+                          'targeting_method'     : targeting_method,
+                          'users'                : users,
+                          'ssh_key_type'         : ssh_key_type,
+                          'ssh_private_key_path' : ssh_private_key_path,
+                          'ssh_public_key_path'  : ssh_public_key_path,
                       }) %}
