@@ -154,9 +154,22 @@
 {%- set initscript_extension = '.service' %}
 {%- else %}
 {%- set initscript       = 'hadoop.init' %}
+<<<<<<< HEAD
 {%- set initscript_targetdir = '/etc/init.d' %}
 {%- set initscript_extension = '' %}
 {%- endif %}
+=======
+{%- set ssh_key_type     = p.get('ssh_key_type', 'dsa') %}
+{%- set ssh_key_source   = p.get('ssh_key_source', 'files') %}
+{%- if ssh_key_source == 'pillar' %}
+{%- set ssh_private_key_path = 'hadoop.users.private_keys' %}
+{%- set ssh_public_key_path = 'hadoop.users.public_keys' %}
+{%- else %}
+{%- set ssh_private_key_path = 'salt://hadoop/files' %}
+{%- set ssh_public_key_path = 'salt://hadoop/files' %}
+{%- endif %}
+
+>>>>>>> travis-integration
 {%- set targeting_method = g.get('targeting_method', p.get('targeting_method', 'grain')) %}
 
 {%- if version_info['major_version'] == '1' %}
@@ -200,4 +213,7 @@
                           'config_core_site' : config_core_site,
                           'targeting_method' : targeting_method,
                           'users'            : users,
+                          'ssh_key_type'         : ssh_key_type,
+                          'ssh_private_key_path' : ssh_private_key_path,
+                          'ssh_public_key_path'  : ssh_public_key_path,
                       }) %}
