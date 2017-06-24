@@ -148,7 +148,15 @@
 {%- set real_config_dist = alt_config + '.dist' %}
 {%- set default_log_root = '/var/log/hadoop' %}
 {%- set log_root         = gc.get('log_root', pc.get('log_root', default_log_root)) %}
+{%- if grains.get('systemd') %}
+{%- set initscript       = 'hadoop.systemd' %}
+{%- set initscript_targetdir = '/etc/systemd/system' %}
+{%- set initscript_extension = '.service' %}
+{%- else %}
 {%- set initscript       = 'hadoop.init' %}
+{%- set initscript_targetdir = '/etc/init.d' %}
+{%- set initscript_extension = '' %}
+{%- endif %}
 {%- set targeting_method = g.get('targeting_method', p.get('targeting_method', 'grain')) %}
 
 {%- if version_info['major_version'] == '1' %}
@@ -182,6 +190,8 @@
                           'real_config'      : real_config,
                           'real_config_dist' : real_config_dist,
                           'initscript'       : initscript,
+                          'initscript_targetdir'       : initscript_targetdir,
+                          'initscript_extension'       : initscript_extension,
                           'dfs_cmd'          : dfs_cmd,
                           'dfsadmin_cmd'     : dfsadmin_cmd,
                           'java_home'        : java_home,

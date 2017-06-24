@@ -10,6 +10,7 @@
 # every node can advertise any JBOD drives to the framework by setting the hdfs_data_disk grain
 {%- set hdfs_disks = hdfs.local_disks %}
 {%- set test_folder = hdfs_disks|first() + '/hdfs/nn/current' %}
+{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-hdfs' %}
 
 {% for disk in hdfs_disks %}
 {{ disk }}/hdfs:
@@ -107,8 +108,9 @@ format-namenode:
     - user: hdfs
     - unless: test -d {{ test_folder }}
 {%- endif %}
+{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-hdfs' %}
 
-/etc/init.d/hadoop-namenode:
+{{ hadoop.initscript_targetdir }}/hadoop-namenode{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -120,9 +122,11 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-namenode'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} namenode'
 {%- if hdfs.namenode_count == 1 %}
-/etc/init.d/hadoop-secondarynamenode:
+{{ hadoop.initscript_targetdir }}/hadoop-secondarynamenode{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -134,6 +138,9 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-secondarynamenode'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} secondarynamenode'
 {%- else %}
 /etc/init.d/hadoop-zkfc:
   file.managed:
@@ -151,7 +158,7 @@ format-namenode:
 {% endif %}
 
 {% if hdfs.is_datanode %}
-/etc/init.d/hadoop-datanode:
+{{ hadoop.initscript_targetdir }}/hadoop-datanode{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -163,10 +170,13 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-datanode'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} datanode'
 {% endif %}
 
 {% if hdfs.is_journalnode %}
-/etc/init.d/hadoop-journalnode:
+{{ hadoop.initscript_targetdir }}/hadoop-journalnode{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -178,6 +188,9 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-journalnode'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} journalnamenode'
 {% endif %}
 
 {% if hdfs.is_namenode and hdfs.namenode_count == 1 %}

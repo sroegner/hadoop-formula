@@ -1,0 +1,18 @@
+[Unit]
+Description=Hadoop {{ hadoop_svc }} Service
+After=network.target
+After=NetworkManager.target
+
+[Service]
+Type=simple
+User={{ hadoop_user }}
+EnvironmentFile=-/{{ systemd_servicegroup_env }}
+EnvironmentFile=-{{ systemd_service_env }}
+ExecStart={{ systemd_cmd }}
+ExecStop=/bin/kill -TERM $MAINPID
+Restart=always
+LimitNOFILE=32768
+LimitNPROC=65536
+
+[Install]
+WantedBy=multi-user.target
