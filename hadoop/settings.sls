@@ -180,6 +180,11 @@
 {%- set dfsadmin_cmd = alt_home + '/bin/hdfs dfsadmin' %}
 {%- endif %}
 
+{%- if grains['os_family'] == "Debian" %}
+{%- set sysconfigdir = '/etc/default' %}
+{%- else %}
+{%- set sysconfigdir = '/etc/sysconfig' %}
+{%- endif %}
 {%- set java_home        = salt['grains.get']('java_home', salt['pillar.get']('java_home', '/usr/lib/java')) %}
 {%- set config_core_site = gc.get('core-site', pc.get('core-site', {})) %}
 
@@ -214,6 +219,7 @@
                           'config_core_site' : config_core_site,
                           'targeting_method' : targeting_method,
                           'users'            : users,
+                          'sysconfigdir'     : sysconfigdir,
                           'ssh_key_type'         : ssh_key_type,
                           'ssh_private_key_path' : ssh_private_key_path,
                           'ssh_public_key_path'  : ssh_public_key_path,

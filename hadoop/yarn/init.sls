@@ -9,7 +9,7 @@
 {% set username = 'yarn' %}
 {% set yarn_home_directory = '/user/' + username %}
 {% set uid = hadoop.users[username] %}
-{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-yarn' %}
+{%- set systemd_servicegroup_env = hadoop.sysconfigdir + '/hadoop-yarn' %}
 
 {{ hadoop_user(username, uid) }}
 
@@ -97,21 +97,21 @@ fix-executor-permissions:
     - user: root
     - template: jinja
 
-/etc/sysconfig/hadoop-historyserver:
+{{ hadoop.sysconfigdir }}/hadoop-historyserver:
   file.managed:
     - source: salt://hadoop/conf/yarn/historyserver.sysconfig
     - mode: 644
     - user: root
     - template: jinja
 
-/etc/sysconfig/hadoop-resourcemanager:
+{{ hadoop.sysconfigdir }}/hadoop-resourcemanager:
   file.managed:
     - source: salt://hadoop/conf/yarn/resourcemanager.sysconfig
     - mode: 644
     - user: root
     - template: jinja
 
-/etc/sysconfig/hadoop-nodemanager:
+{{ hadoop.sysconfigdir }}/hadoop-nodemanager:
   file.managed:
     - source: salt://hadoop/conf/yarn/nodemanager.sysconfig
     - mode: 644
@@ -131,8 +131,8 @@ fix-executor-permissions:
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-historyserver'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-historyserver'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/mapred --config {{ hadoop.alt_config }} historyserver'
 
 hadoop-historyserver:
@@ -151,8 +151,8 @@ hadoop-historyserver:
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-resouremanager'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-resourcemanager'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/yarn --config {{ hadoop.alt_config }} resourcemanager'
 
 hadoop-resourcemanager:
@@ -174,8 +174,8 @@ hadoop-resourcemanager:
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-nodemanager'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-nodemanager'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/yarn --config {{ hadoop.alt_config }} nodemanager'
 
 hadoop-nodemanager:

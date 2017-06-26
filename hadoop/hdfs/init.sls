@@ -10,7 +10,7 @@
 # every node can advertise any JBOD drives to the framework by setting the hdfs_data_disk grain
 {%- set hdfs_disks = hdfs.local_disks %}
 {%- set test_folder = hdfs_disks|first() + '/hdfs/nn/current' %}
-{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-hdfs' %}
+{%- set systemd_servicegroup_env = hadoop.sysconfigdir + '/hadoop-hdfs' %}
 
 {% for disk in hdfs_disks %}
 {{ disk }}/hdfs:
@@ -60,33 +60,36 @@
 {% endfor %}
 
 {%- if grains['systemd'] %}
-/etc/sysconfig/hadoop-hdfs:
+{{ systemd_servicegroup_env }}:
   file.managed:
     - source: salt://hadoop/conf/hdfs/hdfs.sysconfig
     - template: jinja
     - mode: 644
     - user: root
     - group: root
+    - context:
+      log_dir: {{ hadoop.log_root }}
+      log_level: {{ hdfs.log_level }}
 
-/etc/sysconfig/hadoop-namenode:
+{{ hadoop.sysconfigdir }}/hadoop-namenode:
   file.managed:
-    - source: salt://hadoop/conf/hdfs/hdfs-namenode.sysconfig
+    - source: salt://hadoop/conf/hdfs/namenode.sysconfig
     - template: jinja
     - mode: 644
     - user: root
     - group: root
 
-/etc/sysconfig/hadoop-secondarynamenode:
+{{ hadoop.sysconfigdir }}/hadoop-secondarynamenode:
   file.managed:
-    - source: salt://hadoop/conf/hdfs/hdfs-secondarynamenode.sysconfig
+    - source: salt://hadoop/conf/hdfs/secondarynamenode.sysconfig
     - template: jinja
     - mode: 644
     - user: root
     - group: root
 
-/etc/sysconfig/hadoop-datanode:
+{{ hadoop.sysconfigdir }}/hadoop-datanode:
   file.managed:
-    - source: salt://hadoop/conf/hdfs/hdfs-datanode.sysconfig
+    - source: salt://hadoop/conf/hdfs/datanode.sysconfig
     - template: jinja
     - mode: 644
     - user: root
@@ -156,8 +159,8 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-namenode'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-namenode'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} namenode'
 {%- if hdfs.namenode_count == 1 %}
 {{ hadoop.initscript_targetdir }}/hadoop-secondarynamenode{{ hadoop.initscript_extension }}:
@@ -172,8 +175,8 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-secondarynamenode'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-secondarynamenode'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} secondarynamenode'
 {%- else %}
 {{ hadoop.initscript_targetdir }}/hadoop-zkfc{{ hadoop.initscript_extension }}:
@@ -188,8 +191,8 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-zkfc'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-zkfc'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} zkfc'
 {% endif %}
 {% endif %}
@@ -207,8 +210,8 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-datanode'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-datanode'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} datanode'
 {% endif %}
 
@@ -225,8 +228,8 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
-      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
-      systemd_service_env: '/etc/sysconfig/hadoop-journalnode'
+      systemd_group_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '{{ hadoop.sysconfigdir }}/hadoop-journalnode'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} journalnamenode'
 {% endif %}
 

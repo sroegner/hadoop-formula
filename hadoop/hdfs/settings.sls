@@ -85,7 +85,7 @@
 {%- set tmp_dir         = '/tmp' %}
 
 {%- set replicas = gc.get('replication', pc.get('replication', datanode_count % 4 if datanode_count < 4 else 3 )) %}
-
+{%- set log_level = 'INFO' %}
 {%- set config_hdfs_site = gc.get('hdfs-site', pc.get('hdfs-site', {})) %}
 
 {%- set restart_on_config_change = pc.get('restart_on_config_change', False) %}
@@ -114,6 +114,7 @@
                      'config_hdfs_site'            : config_hdfs_site,
                      'tmp_dir'                     : tmp_dir,
                      'load'                        : load,
+                     'log_level'                   : log_level,
                      'ha_cluster_id'               : ha_cluster_id,
                      'quorum_connection_string'    : quorum_connection_string,
                    }) %}
