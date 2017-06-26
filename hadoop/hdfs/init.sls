@@ -145,7 +145,6 @@ format-namenode:
     - user: hdfs
     - unless: test -d {{ test_folder }}
 {%- endif %}
-{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-hdfs' %}
 
 {{ hadoop.initscript_targetdir }}/hadoop-namenode{{ hadoop.initscript_extension }}:
   file.managed:
