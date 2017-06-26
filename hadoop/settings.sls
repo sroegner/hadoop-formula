@@ -154,11 +154,9 @@
 {%- set initscript_extension = '.service' %}
 {%- else %}
 {%- set initscript       = 'hadoop.init' %}
-<<<<<<< HEAD
 {%- set initscript_targetdir = '/etc/init.d' %}
 {%- set initscript_extension = '' %}
 {%- endif %}
-=======
 {%- set ssh_key_type     = p.get('ssh_key_type', 'dsa') %}
 {%- set ssh_key_source   = p.get('ssh_key_source', 'files') %}
 {%- if ssh_key_source == 'pillar' %}
@@ -169,7 +167,6 @@
 {%- set ssh_public_key_path = 'salt://hadoop/files' %}
 {%- endif %}
 
->>>>>>> travis-integration
 {%- set targeting_method = g.get('targeting_method', p.get('targeting_method', 'grain')) %}
 
 {%- if version_info['major_version'] == '1' %}

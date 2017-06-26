@@ -142,7 +142,7 @@ format-namenode:
       systemd_service_env: '/etc/sysconfig/hadoop-secondarynamenode'
       systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} secondarynamenode'
 {%- else %}
-/etc/init.d/hadoop-zkfc:
+{{ hadoop.initscript_targetdir }}/hadoop-zkfc{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -154,6 +154,9 @@ format-namenode:
       hadoop_user: hdfs
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-zkfc'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/hdfs --config {{ hadoop.alt_config }} zkfc'
 {% endif %}
 {% endif %}
 

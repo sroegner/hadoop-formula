@@ -11,6 +11,20 @@
 # this is a deliberate duplication as to not re-import hadoop/settings multiple times
 {%- set targeting_method    = salt['grains.get']('hadoop:targeting_method', salt['pillar.get']('hadoop:targeting_method', 'grain')) %}
 
+# singlenode is for testing/masterless setups - has no mine calls
+{%- if targeting_method == "singlenode" %}
+{%- set namenode_host = salt['grains.get']('fqdn', 'localhost') %}
+{%- set namenode_count = 1 %}
+{%- set datanode_hosts = [namenode_host] %}
+{%- set datanode_count = 1 %}
+{%- set journalnode_count = 0 %}
+
+{%- set is_namenode    = true %}
+{%- set is_primary_namenode   = false %}
+{%- set is_secondary_namenode = false %}
+{%- set is_journalnode = false %}
+{%- set is_datanode    = true %}
+{%- else %}
 # HA requires that you have exactly two NNs
 {%- set namenode_host           = salt['mine.get'](namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
 {%- set primary_namenode_host   = salt['mine.get'](primary_namenode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
@@ -38,6 +52,14 @@
 {%- set journalnode_hosts     = salt['mine.get'](journalnode_target, 'network.interfaces', expr_form=targeting_method).keys() %}
 {%- set datanode_count        = datanode_hosts|count() %}
 {%- set journalnode_count     = journalnode_hosts|count() %}
+
+{%- set is_namenode    = salt['match.' ~ targeting_method](namenode_target) %}
+{%- set is_primary_namenode   = salt['match.' ~ targeting_method](primary_namenode_target) %}
+{%- set is_secondary_namenode = salt['match.' ~ targeting_method](secondary_namenode_target) %}
+{%- set is_journalnode = salt['match.' ~ targeting_method](journalnode_target) %}
+{%- set is_datanode    = salt['match.' ~ targeting_method](datanode_target) %}
+{%- endif %}
+
 {%- set namenode_port         = gc.get('namenode_port', pc.get('namenode_port', '8020')) %}
 {%- set namenode_http_port    = gc.get('namenode_http_port', pc.get('namenode_http_port', '50070')) %}
 {%- set secondarynamenode_http_port  = gc.get('secondarynamenode_http_port', pc.get('secondarynamenode_http_port', '50090')) %}
@@ -65,14 +87,9 @@
 {%- set replicas = gc.get('replication', pc.get('replication', datanode_count % 4 if datanode_count < 4 else 3 )) %}
 
 {%- set config_hdfs_site = gc.get('hdfs-site', pc.get('hdfs-site', {})) %}
-{%- set is_namenode    = salt['match.' ~ targeting_method](namenode_target) %}
-{%- set is_primary_namenode   = salt['match.' ~ targeting_method](primary_namenode_target) %}
-{%- set is_secondary_namenode = salt['match.' ~ targeting_method](secondary_namenode_target) %}
-{%- set is_journalnode = salt['match.' ~ targeting_method](journalnode_target) %}
-{%- set is_datanode    = salt['match.' ~ targeting_method](datanode_target) %}
 
 {%- set restart_on_config_change = pc.get('restart_on_config_change', False) %}
-
+{{ namenode_host }}
 {%- set hdfs = {} %}
 {%- do hdfs.update({ 'local_disks'                 : local_disks,
                      'namenode_host'               : namenode_host,
