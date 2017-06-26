@@ -7,7 +7,8 @@ services:
 
 before_install:
   - bundle install
-  - mkdir vendor && cd $_ && ( for i in sun-java; do git clone http://github.com/saltstack-formulas/$i-formula.git; mv $i-formula/$i .; rm -rf $i-formula; done ); cd ..
+  - mkdir -p vendor/testdata
+  - cd vendor && ( for i in sun-java; do git clone http://github.com/saltstack-formulas/$i-formula.git; mv $i-formula/$i .; rm -rf $i-formula; done ); cd ..
   - cd vendor && mkdir -p hadoop/files && cd $_ && ( for j in hdfs mapred yarn; do ssh-keygen -q -t dsa -C $j -f dsa-$j -N ''; done); cd ../../.. 
 
 script: bundle exec kitchen verify

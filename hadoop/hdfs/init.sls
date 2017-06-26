@@ -59,6 +59,40 @@
 
 {% endfor %}
 
+{%- if grains['systemd'] %}
+/etc/sysconfig/hadoop-hdfs:
+  file.managed:
+    - source: salt://hadoop/conf/hdfs/hdfs.sysconfig
+    - template: jinja
+    - mode: 644
+    - user: root
+    - group: root
+
+/etc/sysconfig/hadoop-namenode:
+  file.managed:
+    - source: salt://hadoop/conf/hdfs/hdfs-namenode.sysconfig
+    - template: jinja
+    - mode: 644
+    - user: root
+    - group: root
+
+/etc/sysconfig/hadoop-secondarynamenode:
+  file.managed:
+    - source: salt://hadoop/conf/hdfs/hdfs-secondarynamenode.sysconfig
+    - template: jinja
+    - mode: 644
+    - user: root
+    - group: root
+
+/etc/sysconfig/hadoop-datanode:
+  file.managed:
+    - source: salt://hadoop/conf/hdfs/hdfs-datanode.sysconfig
+    - template: jinja
+    - mode: 644
+    - user: root
+    - group: root
+{%- endif %}
+
 {{ hadoop.alt_config }}/core-site.xml:
   file.managed:
     - source: salt://hadoop/conf/hdfs/core-site.xml

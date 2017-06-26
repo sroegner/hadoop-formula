@@ -148,6 +148,9 @@
 {%- set real_config_dist = alt_config + '.dist' %}
 {%- set default_log_root = '/var/log/hadoop' %}
 {%- set log_root         = gc.get('log_root', pc.get('log_root', default_log_root)) %}
+{%- set default_log_level = 'INFO' %}
+{%- set hadoop_log_level = gc.get('log_level', pc.get('log_level', default_log_level)) %}
+
 {%- if grains.get('systemd') %}
 {%- set initscript       = 'hadoop.systemd' %}
 {%- set initscript_targetdir = '/etc/systemd/system' %}
@@ -207,6 +210,7 @@
                           'java_home'        : java_home,
                           'log_root'         : log_root,
                           'default_log_root' : default_log_root,
+                          'log_level'        : log_level,
                           'config_core_site' : config_core_site,
                           'targeting_method' : targeting_method,
                           'users'            : users,

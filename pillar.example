@@ -12,6 +12,7 @@ hadoop:
     yarn: 6003
   config:
     directory: /etc/hadoop/conf
+    log_level: INFO
     core-site:
       io.native.lib.available:
         value: true
@@ -24,6 +25,7 @@ hdfs:
   namenode_target: "roles:hadoop_master" # Specify compound matching string to match all your namenodes
   datanode_target: "roles:hadoop_slave" # Specify compound matching string to match all your datanodes e.g. if you were to use pillar I@datanode:true
   config:
+    log_level: INFO
     namenode_port: 8020
     namenode_http_port: 50070
     secondarynamenode_http_port: 50090
@@ -42,6 +44,7 @@ mapred:
   jobtracker_target: "roles:hadoop_master"
   tasktracker_target: "roles:hadoop_slave"
   config:
+    log_level: INFO
     jobtracker_port: 9001
     jobtracker_http_port: 50030
     jobhistory_port: 10020
@@ -69,6 +72,7 @@ yarn:
   resourcemanager_target: "roles:hadoop_master"
   nodemanager_target: "roles:hadoop_slave"
   config:
+    log_level: INFO
     yarn-site:
       yarn.nodemanager.aux-services:
         value: mapreduce_shuffle
