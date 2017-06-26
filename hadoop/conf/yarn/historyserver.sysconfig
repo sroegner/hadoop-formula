@@ -1,0 +1,2 @@
+YARN_LOGFILE="yarn-historyserver.log"
+HADOOP_MAPRED_LOGFILE="yarn-historyserver.log"

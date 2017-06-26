@@ -14,12 +14,18 @@
 {%- set tasktracker_target = g.get('tasktracker_target', p.get('tasktracker_target', 'roles:hadoop_slave')) %}
 {%- set targeting_method = salt['grains.get']('hadoop:targeting_method', salt['pillar.get']('hadoop:targeting_method', 'grain')) %}
 
+{%- if targeting_method == "singlenode" %}
+{%- set jobtracker_host = salt['grains.get']('fqdn', 'localhost') %}
+{%- set is_jobtracker   = true %}
+{%- set is_tasktracker  = true %}
+{%- else %}
 {%- set jobtracker_host  = salt['mine.get'](jobtracker_target, 'network.interfaces', expr_form=targeting_method)|first %}
-{%- set local_disks     = salt['grains.get']('mapred_data_disks', ['/data']) %}
-{%- set config_mapred_site = gc.get('mapred-site', pc.get('mapred-site', {})) %}
-
 {%- set is_jobtracker = salt['match.' ~ targeting_method](jobtracker_target) %}
 {%- set is_tasktracker = salt['match.' ~ targeting_method](tasktracker_target) %}
+{%- endif %}
+
+{%- set local_disks     = salt['grains.get']('mapred_data_disks', ['/data']) %}
+{%- set config_mapred_site = gc.get('mapred-site', pc.get('mapred-site', {})) %}
 
 {%- set mapred = {} %}
 {%- do mapred.update({ 'jobtracker_port'               : jobtracker_port|string(),

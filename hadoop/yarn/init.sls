@@ -9,6 +9,8 @@
 {% set username = 'yarn' %}
 {% set yarn_home_directory = '/user/' + username %}
 {% set uid = hadoop.users[username] %}
+{%- set systemd_servicegroup_env = '/etc/sysconfig/hadoop-yarn' %}
+
 {{ hadoop_user(username, uid) }}
 
 {% if yarn.is_resourcemanager or yarn.is_nodemanager %}
@@ -87,7 +89,37 @@ fix-executor-permissions:
 {{ hdfs_mkdir(yarn_home_directory, username, username, 700, hadoop.dfs_cmd) }}
 {{ hdfs_mkdir(rald, username, 'hadoop', 1777, hadoop.dfs_cmd) }}
 
-/etc/init.d/hadoop-historyserver:
+{%- if grains['systemd'] %}
+{{ systemd_servicegroup_env }}:
+  file.managed:
+    - source: salt://hadoop/conf/yarn/yarn.sysconfig
+    - mode: 644
+    - user: root
+    - template: jinja
+
+/etc/sysconfig/hadoop-historyserver:
+  file.managed:
+    - source: salt://hadoop/conf/yarn/historyserver.sysconfig
+    - mode: 644
+    - user: root
+    - template: jinja
+
+/etc/sysconfig/hadoop-resourcemanager:
+  file.managed:
+    - source: salt://hadoop/conf/yarn/resourcemanager.sysconfig
+    - mode: 644
+    - user: root
+    - template: jinja
+
+/etc/sysconfig/hadoop-nodemanager:
+  file.managed:
+    - source: salt://hadoop/conf/yarn/nodemanager.sysconfig
+    - mode: 644
+    - user: root
+    - template: jinja
+{%- endif %}
+
+{{ hadoop.initscript_targetdir }}/hadoop-historyserver{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -96,15 +128,18 @@ fix-executor-permissions:
     - template: jinja
     - context:
       hadoop_svc: historyserver
-      hadoop_user: hdfs
+      hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-historyserver'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/mapred --config {{ hadoop.alt_config }} historyserver'
 
 hadoop-historyserver:
   service.running:
     - enable: True
 
-/etc/init.d/hadoop-resourcemanager:
+{{ hadoop.initscript_targetdir }}/hadoop-resourcemanager{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -112,10 +147,13 @@ hadoop-historyserver:
     - mode: '755'
     - template: jinja
     - context:
-      hadoop_svc: resourcemanager
+      hadoop_svc: resouremanager
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-resouremanager'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/yarn --config {{ hadoop.alt_config }} resourcemanager'
 
 hadoop-resourcemanager:
   service.running:
@@ -124,7 +162,7 @@ hadoop-resourcemanager:
 
 {% if yarn.is_nodemanager %}
 
-/etc/init.d/hadoop-nodemanager:
+{{ hadoop.initscript_targetdir }}/hadoop-nodemanager{{ hadoop.initscript_extension }}:
   file.managed:
     - source: salt://hadoop/files/{{ hadoop.initscript }}
     - user: root
@@ -136,6 +174,9 @@ hadoop-resourcemanager:
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
+      systemd_servicegroup_env: {{ systemd_servicegroup_env }}
+      systemd_service_env: '/etc/sysconfig/hadoop-nodemanager'
+      systemd_cmd: '{{ hadoop.alt_home}}/bin/yarn --config {{ hadoop.alt_config }} nodemanager'
 
 hadoop-nodemanager:
   service.running:
