@@ -42,8 +42,10 @@ unpack-hadoop-dist:
   archive.extracted:
     - name: /usr/lib/
     - source: {{ hadoop.source_url }}
+    - trim_output: 5
 {%- if hadoop.source_hash %}
     - source_hash: md5={{ hadoop.source_hash }}
+    - source_hash_update: True
 {%- else %}
     - skip_verify: True
 {%- endif %}

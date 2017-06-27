@@ -147,7 +147,7 @@ hadoop-historyserver:
     - mode: '755'
     - template: jinja
     - context:
-      hadoop_svc: resouremanager
+      hadoop_svc: resourcemanager
       hadoop_user: yarn
       hadoop_major: {{ hadoop.major_version }}
       hadoop_home: {{ hadoop.alt_home }}
