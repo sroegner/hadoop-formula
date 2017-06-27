@@ -59,7 +59,7 @@
 
 {% endfor %}
 
-{%- if grains['systemd'] %}
+{%- if 'systemd' in grains %}
 {{ systemd_servicegroup_env }}:
   file.managed:
     - source: salt://hadoop/conf/hdfs/hdfs.sysconfig

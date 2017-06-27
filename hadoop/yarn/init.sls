@@ -89,7 +89,7 @@ fix-executor-permissions:
 {{ hdfs_mkdir(yarn_home_directory, username, username, 700, hadoop.dfs_cmd) }}
 {{ hdfs_mkdir(rald, username, 'hadoop', 1777, hadoop.dfs_cmd) }}
 
-{%- if grains['systemd'] %}
+{%- if 'systemd' in grains %}
 {{ systemd_servicegroup_env }}:
   file.managed:
     - source: salt://hadoop/conf/yarn/yarn.sysconfig

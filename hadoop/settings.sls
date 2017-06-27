@@ -151,7 +151,7 @@
 {%- set default_log_level = 'INFO' %}
 {%- set hadoop_log_level = gc.get('log_level', pc.get('log_level', default_log_level)) %}
 
-{%- if grains.get('systemd') %}
+{%- if 'systemd' in grains %}
 {%- set initscript       = 'hadoop.systemd' %}
 {%- set initscript_targetdir = '/etc/systemd/system' %}
 {%- set initscript_extension = '.service' %}
