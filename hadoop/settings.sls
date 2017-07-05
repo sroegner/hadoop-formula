@@ -55,6 +55,12 @@
                                         'source_hash'   : g.get('source_hash', p.get('source_hash', 'c728a090b68d009070085367695ed507')),
                                         'major_version' : '2',
                                       },
+                     'hdp-2.7.3'    : { 'version'       : '2.7.3.2.5.3.0-37',
+                                        'version_name'  : 'hadoop-2.7.3.2.5.3.0-37',
+                                        'source_url'    : g.get('source_url', p.get('source_url', 'http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.5.3.0/tars/hadoop-2.7.3.2.5.3.0-37.tar.gz')),
+                                        'source_hash'   : g.get('source_hash', p.get('source_hash', '')),
+                                        'major_version' : '2'
+                                      },
                      'hdp-2.7.1'    : { 'version'       : '2.7.1.2.3.4.0-3485',
                                         'version_name'  : 'hadoop-2.7.1.2.3.4.0-3485',
                                         'source_url'    : g.get('source_url', p.get('source_url', 'http://public-repo-1.hortonworks.com/HDP/centos6/2.x/updates/2.3.4.0/tars/hadoop-2.7.1.2.3.4.0-3485.tar.gz')),
