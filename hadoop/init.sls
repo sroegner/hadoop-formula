@@ -5,6 +5,10 @@ hadoop:
     - gid: {{ hadoop.users['hadoop'] }}
 
 {%- if grains['os_family'] == 'RedHat' %}
+{%- if grains['os'] == 'Amazon' and grains['osrelease'] == 2 %}
+{%- else %}
+system-lsb:
+{%- endif %}
 redhat-lsb:
   pkg.installed
 {%- endif %}
